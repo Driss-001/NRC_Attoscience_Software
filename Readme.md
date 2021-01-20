@@ -1,6 +1,6 @@
 # NRC_Project
 
-repo to control the devellopment of the analog to didital interface module using  the KS0413 keyestudio ESP32 Core Board , [Board wiki](https://wiki.keyestudio.com/KS0413_keyestudio_ESP32_Core_Board#Resources_Download)
+repo to control the devellopment of the analog to didital interface module using  the KS0413 keyestudio ESP32 Core Board , [Board wiki](https://wiki.keyestudio.com/KS0413_keyestudio_ESP32_Core_Board)
 
 ![](https://wiki.keyestudio.com/images/7/79/0413%E5%9B%BE%E7%89%872.png)
 
