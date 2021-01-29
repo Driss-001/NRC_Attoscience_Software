@@ -13,5 +13,7 @@ repo to control the devellopment of the analog to didital interface module using
 High Harmonic Generation will be observed using 3 photodiodes.
 The first  one will record the incoming laser impulse energy, the second will measure the beam diverted by the beam splitter.
  
+## Demo Output
 
+![](https://github.com/Driss-001/NRC_Attoscience_Software/blob/main/NRC_PROJ/Figure_1.png?raw=true)
 
