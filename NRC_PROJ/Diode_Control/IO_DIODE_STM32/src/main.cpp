@@ -10,13 +10,13 @@ char buff[10];
 
 void setup() {
   
-  Serial.begin(115200);
+  Serial.begin(500000);
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
 
-  Serial.println("Setup done");
+  //Serial.println("Setup done");
  
   
 
@@ -49,7 +49,7 @@ void loop() {
       }
     }
   Serial.print('\n');
-    delay(1);
+  delay(1);
   
   // put your main code here, to run repeatedly:
 }

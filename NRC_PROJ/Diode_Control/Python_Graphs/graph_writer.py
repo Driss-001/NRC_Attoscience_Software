@@ -2,20 +2,17 @@ import numpy as np
 import math  as mt 
 import matplotlib.pyplot as plt 
 from matplotlib.animation import FuncAnimation
-import serial , struct,re ,time,sys
-#import keyboard as kb 
-import continuous_threading
-import threading
-#import ctypes
+import serial , struct,re ,time,sys ,queue ,continuous_threading ,threading
 import pandas as pd
 
 
 ser = serial.Serial('COM3')
-ser.baudrate = 115200
-ser.timeout = 1
+ser.baudrate = 500000
+#ser.timeout = 10**-3
 SPD1,SPDT,corr1,SPD3, corr2,SPD3_corr1, SPD3_corr2 = [],[],[],[],[],[],[]
 Parser = pd.DataFrame()
-ser_data = []
+
+trans_data_queue = queue.Queue()
  
 fig = plt.figure()
  
@@ -31,7 +28,7 @@ plt.ion
 ax = fig.add_subplot()
 ax.set_xlabel("SPD1")
 ax.set_ylabel("SPDT")
-hl1, = ax.plot(corr1,SPD3_corr1,'ro',c= "gray")
+hl1, = ax.plot(SPD1,SPDT,'ro',c= "gray")
 hl2, = ax.plot(corr2,SPD3_corr2,'ro',c= "red")
 
 ax.set_aspect('auto')
@@ -44,36 +41,19 @@ lines = [hl1,hl2]
         
 
 
-def update_line():
+def update_line(self):
 
-    
-    for i in range(len(SPD1)):
-   
-        if SPD1[i]==SPDT[i]:
-            corr1.append(SPD1[i])
-            SPD3_corr1.append(SPD3[i])
-    
-    hl1.set_data(corr1,SPD3_corr1)
+    hl1.set_data(SPD1,SPDT)
     
     for i in range(len(corr1)):
-        if SPD3_corr1[i] ==3-corr1[i]:
-            corr2.append(corr1[i])
-            SPD3_corr2.append(SPD3_corr2[i])
+        if SPD1 == SPDT:
+            SPD3_corr1.append(SPD1[i])
     
-    hl2.set_data(corr2,SPD3_corr2)
+    hl2.set_data(SPD3_corr1,SPD3_corr1)
 
-    #plt.pause(0.01)
+    
     return lines
-
-def Anim_Plot():
-
-    ani = FuncAnimation(fig,
-                    update_line,
-                    fargs=None,
-                    frames=10,
-                    interval=100)
-
-                   
+                
 
 
 def store_data():
@@ -91,18 +71,19 @@ def store_data():
 
 
 
-def data_thread(run_num):
-    #global progress_counter
+def data_thread():
+    global progress_counter
     global  progress_counter
     global reading
-    
+
     reading = True
 
-    for i in range(run_num*10**3):
-        #ser.flush()
+    while reading:
         progress_counter += 1
+        
         #reading = True
         try:
+           
             raw_data = ser.readline().decode("ascii")
             t_data=[float(val) for val in raw_data.split(';')]
             SPD1.append(t_data[0])
@@ -110,68 +91,68 @@ def data_thread(run_num):
             SPD3.append(t_data[2])
         except: UnicodeDecodeError    
 
-        
 
         #while(ser.inWaiting()==0):
         #       pass
         #reading = False
-        ser.flush()
-        time.sleep(10**-3)
+        #ser.reset_input_buffer()
+        #time.sleep(10**-3)
+
     
-    reading = False    
+     
             
+ani = FuncAnimation(fig,
+                    update_line,
+                    frames=30,
+                    interval=50)
+
+def handle_close(evt): #define plot window closing event
+    
+    global reading
+    reading = False
 
 
+fig.canvas.mpl_connect('close_event',handle_close)
 
-# Print iterations progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
-    # Print New Line on Complete
-    if iteration == total: 
-        print()
+start = time.time()
 
 def main():
-    run_time = 5 #int(sys.argv[1])*60
-    th1 = threading.Thread(target=data_thread,args=(run_time,))
+
+
+    #plot_refreshms = 10
+    #sleep_time = 10**-3
+    th1 = threading.Thread(target=data_thread)
     #data_thread(run_time)
     th1.daemon = True
-    #th2.daemon = True
  
     th1.start()
-    th1.join()
-    print(progress_counter)
+    
+    plt.show()
+
+    ani.save("Anim_Plot.gif", writer="imagemagick",fps = 330)
+    fig.savefig("Data_Plot.png")
     
     store_data()
     #printProgressBar(run_time,progress_counter)
 
-    update_line()
-
-    plt.show()
+    #update_line()
+    
   
 
     
+
 
     
 
 if __name__ == "__main__":
     
     main()
-
+    
+    t=time.time()-start
+    print("Elapsed Time: "+str(round(t,2))+"s")
+    
+    
+    print(len(SPD1),len(SPDT),len(SPD3))
     #try:
     #    main()
     #except: 

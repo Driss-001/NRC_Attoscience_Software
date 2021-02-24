@@ -17,5 +17,6 @@ The first  one will record the incoming laser impulse energy, the second will me
 
 ## Demo Output
 
-![](https://github.com/Driss-001/NRC_Attoscience_Software/blob/main/NRC_PROJ/Figure_1.png?raw=true)
+![](https://github.com/Driss-001/NRC_Attoscience_Software/blob/main/Data_Plot.png?raw=true)
+
 
