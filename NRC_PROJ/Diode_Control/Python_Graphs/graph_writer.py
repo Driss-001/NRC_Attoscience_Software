@@ -1,13 +1,18 @@
 import numpy as np 
 import math  as mt 
 import matplotlib.pyplot as plt 
-from matplotlib.animation import FuncAnimation
-import serial , struct,re ,time,sys ,queue ,continuous_threading ,threading
+from matplotlib.animation import FuncAnimation,PillowWriter
+import serial , struct,re ,time,sys ,queue ,continuous_threading ,threading ,serial.tools.list_ports
 import pandas as pd
 
 
-ser = serial.Serial('COM3')
-ser.baudrate = 500000
+ports = list(serial.tools.list_ports.comports())
+for p in ports:
+    if "Silicon Labs" in p.description:
+        com  =p.name
+
+ser = serial.Serial(com)
+ser.baudrate = 600000
 #ser.timeout = 10**-3
 SPD1,SPDT,corr1,SPD3, corr2,SPD3_corr1, SPD3_corr2 = [],[],[],[],[],[],[]
 Parser = pd.DataFrame()
@@ -31,9 +36,11 @@ ax.set_ylabel("SPDT")
 hl1, = ax.plot(SPD1,SPDT,'ro',c= "gray")
 hl2, = ax.plot(corr2,SPD3_corr2,'ro',c= "red")
 
+#ax[1].set_ylabel("photon count")
+
 ax.set_aspect('auto')
-ax.set_xlim(xmin=-1,xmax=3.1)
-ax.set_ylim(ymin=-1,ymax=3.1)
+#ax.set_xlim(xmin=-1,xmax=3.1)
+#ax.set_ylim(ymin=-1,ymax=3.1)
    
 lines = [hl1,hl2]
 
@@ -51,6 +58,8 @@ def update_line(self):
     
     hl2.set_data(SPD3_corr1,SPD3_corr1)
 
+    ax.set_xlim(xmin=-1,xmax=np.max(SPD1))
+    ax.set_ylim(ymin=-1,ymax=np.max(SPDT))
     
     return lines
                 
@@ -103,7 +112,6 @@ def data_thread():
             
 ani = FuncAnimation(fig,
                     update_line,
-                    frames=30,
                     interval=50)
 
 def handle_close(evt): #define plot window closing event
@@ -127,9 +135,16 @@ def main():
  
     th1.start()
     
+  
     plt.show()
 
-    ani.save("Anim_Plot.gif", writer="imagemagick",fps = 330)
+
+
+    global end_time
+    end_time = time.time()
+    
+    ani.save("Anim_Plot.gif", writer="pillow",fps=30)
+    
     fig.savefig("Data_Plot.png")
     
     store_data()
@@ -147,9 +162,9 @@ def main():
 if __name__ == "__main__":
     
     main()
-    
-    t=time.time()-start
-    print("Elapsed Time: "+str(round(t,2))+"s")
+    global end_time
+    t=end_time-start
+    print("Elapsed Data Reading Time: "+str(round(t,2))+"s")
     
     
     print(len(SPD1),len(SPDT),len(SPD3))
