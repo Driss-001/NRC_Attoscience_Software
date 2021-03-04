@@ -1,9 +1,9 @@
 # NRC_Project
 
-repo to control the devellopment of the analog to didital interface module using  the KS0413 keyestudio ESP32 Core Board , [Board wiki](https://wiki.keyestudio.com/KS0413_keyestudio_ESP32_Core_Board) ,[PinOut references](https://randomnerdtutorials.com/esp32-pinout-reference-gpios/)
+repo to control the devellopment of the analog to didital interface module using  the KS0413 keyestudio ESP32 Core Board , [Board wiki](https://wiki.keyestudio.com/KS0413_keyestudio_ESP32_Core_Board) ,[PinOut references](https://docs.platformio.org/en/latest/platforms/espressif32.html#pinout-diagram)
 
 ![](https://wiki.keyestudio.com/images/7/79/0413%E5%9B%BE%E7%89%872.png)
-![](https://i0.wp.com/randomnerdtutorials.com/wp-content/uploads/2018/08/esp32-pinout-chip-ESP-WROOM-32.png?w=1401&quality=100&strip=all&ssl=1)
+![](https://docs.platformio.org/en/latest/_images/espressif32_debug_pinout.jpg)
 
  ## Basic Concepts
 
