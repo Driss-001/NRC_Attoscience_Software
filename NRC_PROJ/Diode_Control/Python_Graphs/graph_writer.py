@@ -1,12 +1,13 @@
-import numpy as np 
+#import numpy as np 
 import math  as mt 
 import matplotlib.pyplot as plt 
 from matplotlib.animation import FuncAnimation,PillowWriter
-import serial , struct,re ,time,sys ,queue ,continuous_threading ,threading ,serial.tools.list_ports
+import serial , struct,re ,time,sys ,threading ,serial.tools.list_ports
 import pandas as pd
 
 
 ports = list(serial.tools.list_ports.comports())
+
 for p in ports:
     if "Silicon Labs" in p.description:
         com  =p.name
@@ -17,7 +18,6 @@ ser.baudrate = 600000
 SPD1,SPDT,corr1,SPD3, corr2,SPD3_corr1, SPD3_corr2 = [],[],[],[],[],[],[]
 Parser = pd.DataFrame()
 
-trans_data_queue = queue.Queue()
  
 fig = plt.figure()
  
@@ -25,15 +25,15 @@ fig = plt.figure()
 progress_counter = 0
 reading  = False
  
-     
+Time = []     
 
 
 plt.ion
 
 ax = fig.add_subplot()
-ax.set_xlabel("SPD1")
-ax.set_ylabel("SPDT")
-hl1, = ax.plot(SPD1,SPDT,'ro',c= "gray")
+ax.set_ylabel("SPD1")
+ax.set_xlabel("time")
+hl1, = ax.plot(Time,SPD1,c= "blue")
 hl2, = ax.plot(corr2,SPD3_corr2,'ro',c= "red")
 
 #ax[1].set_ylabel("photon count")
@@ -50,16 +50,16 @@ lines = [hl1,hl2]
 
 def update_line(self):
 
-    hl1.set_data(SPD1,SPDT)
+    hl1.set_data(Time,SPD1)
     
-    for i in range(len(corr1)):
-        if SPD1 == SPDT:
-            SPD3_corr1.append(SPD1[i])
+    #for i in range(len(corr1)):
+    #    if SPD1 == SPDT:
+    #        SPD3_corr1.append(SPD1[i])
     
-    hl2.set_data(SPD3_corr1,SPD3_corr1)
+    #.set_data(SPD3_corr1,SPD3_corr1)
 
-    ax.set_xlim(xmin=-1,xmax=np.max(SPD1))
-    ax.set_ylim(ymin=-1,ymax=np.max(SPDT))
+    #ax.set_ylim(xmin=-1,xmax=max(SPD1))
+    #ax.set_ylim(ymin=-1,ymax=max(SPDT))
     
     return lines
                 
@@ -69,7 +69,10 @@ def store_data():
     
     Parser["SPD1"] = SPD1
     Parser["SPDT"] = SPDT
-    Parser["SPD3"] = SPD3
+    #Parser["SPD#"] = SPD3   
+
+    Parser["time"] = Time
+    #Parser["SPD3"] = SPD3
 
     file = "Experiment_Data.xlsx"
     writer = pd.ExcelWriter(file,engine = 'xlsxwriter') #save results in excel sheets
@@ -82,7 +85,6 @@ def store_data():
 
 def data_thread():
     global progress_counter
-    global  progress_counter
     global reading
 
     reading = True
@@ -96,8 +98,9 @@ def data_thread():
             raw_data = ser.readline().decode("ascii")
             t_data=[float(val) for val in raw_data.split(';')]
             SPD1.append(t_data[0])
+            Time.append(progress_counter/1000)
             SPDT.append(t_data[1])
-            SPD3.append(t_data[2])
+            #SPD3.append(t_data[2])
         except: UnicodeDecodeError    
 
 
@@ -143,15 +146,15 @@ def main():
     global end_time
     end_time = time.time()
     
-    ani.save("Anim_Plot.gif", writer="pillow",fps=30)
+    #ani.save("Anim_Plot.gif", writer="pillow",fps=30)
     
-    fig.savefig("Data_Plot.png")
+    #fig.savefig("Data_Plot.png")
     
     store_data()
     #printProgressBar(run_time,progress_counter)
 
     #update_line()
-    
+    print(SPD1[0:5])
   
 
     
@@ -167,7 +170,7 @@ if __name__ == "__main__":
     print("Elapsed Data Reading Time: "+str(round(t,2))+"s")
     
     
-    print(len(SPD1),len(SPDT),len(SPD3))
+    print(len(SPD1),len(Time),len(SPDT))
     #try:
     #    main()
     #except: 

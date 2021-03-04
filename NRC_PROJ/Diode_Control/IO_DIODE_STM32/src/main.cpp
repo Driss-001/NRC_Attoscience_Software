@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "WiFi.h"
 #define SIZE_OF_ARRAY 3
+#define pin_1 36
+#define pin_2 39
 
 float data[SIZE_OF_ARRAY] ; // array to store data
 
@@ -37,8 +39,14 @@ void send_array(float msg[]) {
   Serial.print('\n');
 }
 
+float volt_conv(int d){
 
-void demo() {
+  float v = 3.3*d/4095;
+  return v;
+
+}
+
+void demo() {  //dummy data-set generator
   
   uint8_t d = random(0,99);
   float d1 = float(d)/float(100);
@@ -56,12 +64,20 @@ void demo() {
 
 }
 
+void exp_1() { //real experiment code
+  uint8_t d1 = analogRead(pin_1);
+  uint8_t d2 = analogRead(pin_2);
+  data[0] =  volt_conv(d1);
+  data[1] =  volt_conv(d2);
+  send_array(data);
+  delay(1);
+}
 
 
 void loop() {
-  //dummy data-set generator
+
   Serial.flush();
-  demo();
+  exp_1();
   
   // put your main code here, to run repeatedly:
 }
