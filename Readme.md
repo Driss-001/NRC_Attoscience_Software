@@ -22,7 +22,7 @@ The first  one will record the incoming laser impulse energy, the second will me
 
 ## Experiment Results
 
-![](https://github.com/Driss-001/NRC_Attoscience_Software/blob/main/Experiment_Data4.png?raw=true)
+![](https://github.com/Driss-001/NRC_Attoscience_Software/blob/main/Experiment_Data4wSI.png?raw=true)
 Integrator results with Silicon crystal
 
 ![](https://github.com/Driss-001/NRC_Attoscience_Software/blob/main/Harmonic_spectrum_500ms.png?raw=true)
